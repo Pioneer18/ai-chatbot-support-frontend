@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-support-frontend
+  labels:
+    app: chatbot-support-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: chatbot-support-frontend
+  template:
+    metadata:
+      labels:
+        app: chatbot-support-frontend
+    spec:
+      containers:
+      - name: chatbot-support-frontend
+        image: ''
+        ports:
+        - containerPort: 8080

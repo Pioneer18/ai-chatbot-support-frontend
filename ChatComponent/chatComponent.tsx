@@ -12,7 +12,7 @@ const ChatComponent: React.FC = () => {
   const [input, setInput] = useState<string>(''); // input is a string
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:3000'); // Backend WebSocket URL
+    const socketInstance = io('http://localhost:3000'); // Backend WebSocket URL - and make this a env variable!
     setSocket(socketInstance);
 
     socketInstance.on('message', (message: string) => { // Assuming message is a string
