@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: chatbot-support-frontend
-        image: ''
+        image: 'gcr.io/ai-chatbot-support-444616/chatbot-support-frontend:v1'
         ports:
         - containerPort: 8080
