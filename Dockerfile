@@ -9,7 +9,7 @@ RUN npm run build
 # Step 2: Run stage
 FROM node:18-slim as run
 
-WORKDIR /app .
+WORKDIR /app
 COPY --from=build /app .
 
 RUN npm install --production

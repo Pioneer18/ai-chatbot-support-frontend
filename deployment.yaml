@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot-support-frontend
+  name: chatbot-support-frontend-deployment
   labels:
     app: chatbot-support-frontend
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: chatbot-support-frontend
@@ -17,5 +17,6 @@ spec:
       containers:
       - name: chatbot-support-frontend
         image: 'gcr.io/ai-chatbot-support-444616/chatbot-support-frontend:v1'
+        imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - containerPort: 80
