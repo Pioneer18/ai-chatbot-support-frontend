@@ -6,7 +6,7 @@ interface Message {
   text: string;
 }
 
-const ChatComponent: React.FC = () => {
+const ChatComponent = () => {
   const [socket, setSocket] = useState<Socket | null>(null); // socket can be either Socket or null
   const [messages, setMessages] = useState<Message[]>([]); // Array of messages with Message type
   const [input, setInput] = useState<string>(''); // input is a string
@@ -38,17 +38,18 @@ const ChatComponent: React.FC = () => {
   // emitting each keystroke into the input through the websocket
   return (
     <div>
-      <div>
+      <div role="list" aria-label="messages">
         {messages.map((msg) => (
           <div key={msg.id}>{msg.text}</div>
         ))}
       </div>
       <input
+        aria-label='ai request input'
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button onClick={sendMessage}>Send</button>
+      <button aria-label='submit ai request' onClick={sendMessage}>Send</button>
     </div>
   );
 };
