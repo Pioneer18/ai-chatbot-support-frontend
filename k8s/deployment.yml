@@ -15,8 +15,14 @@ spec:
         app: chatbot-support-frontend
     spec:
       containers:
-      - name: chatbot-support-frontend
-        image: 'gcr.io/ai-chatbot-support-444616/chatbot-support-frontend:v1'
+      - image: 'gcr.io/ai-chatbot-support-444616/chatbot-support-frontend:v1'
         imagePullPolicy: Always
+        name: chatbot-support-frontend
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
         ports:
         - containerPort: 80
