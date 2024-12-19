@@ -22,7 +22,8 @@ spec:
           periodSeconds: 5
           exec:
             command:
-            - cat
-            - /tmp/healthy
+            - sh
+            - -c
+            - "mkdir -p /tmp && touch /tmp/healthy && cat /tmp/healthy"
         ports:
         - containerPort: 80
