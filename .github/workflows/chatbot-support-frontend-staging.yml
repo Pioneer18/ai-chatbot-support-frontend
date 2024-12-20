@@ -1,0 +1,88 @@
+name: 'Build and Deploy to GKE'
+
+on:
+  push:
+    branches:
+      - 'staging'
+
+env:
+  PROJECT_ID: 'ai-chatbot-support-444616'
+  GAR_LOCATION: 'us-central1'
+  GKE_CLUSTER: 'ai-support-chatbot-cluster'
+  GKE_REGION: 'us-central1'
+  GKE_ZONE: 'us-central1'
+  DEPLOYMENT_NAME: 'chatbot-support-frontend' 
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/750880222185/locations/global/workloadIdentityPools/ghw-pool/providers/my-repo'
+  SERVICE_ACCOUNT: 'github-workflows-sa@ai-chatbot-support-444616.iam.gserviceaccount.com'
+
+jobs:
+  setup-build-publish-deploy:
+    name: 'Setup, Build, Publish, and Deploy'
+    runs-on: 'ubuntu-latest'
+    environment: 'production'
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332' # actions/checkout@v4
+      
+      - name: 'Setup Node.JS for running the tests'
+        run: npm install
+      
+      - name: 'Run the tests'
+        run: npm test
+
+      # Configure Workload Identity Federation and generate an access token.
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        if: success()
+        uses: 'google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2' # google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ env.SERVICE_ACCOUNT }}'
+      
+      # Authenticate Docker to Google Container Registry (GCR)
+      - name: Configure Docker Auth for GCR
+        if: success()
+        run: gcloud auth configure-docker --quiet
+
+      # Get the GKE credentials so we can deploy to the cluster
+      - name: 'Set up GKE credentials'
+        if: success()
+        uses: 'google-github-actions/get-gke-credentials@6051de21ad50fbb1767bc93c11357a49082ad116' # google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          location: '${{ env.GKE_ZONE }}'
+
+      # Install gke-gcloud-auth-plugin manually via apt-get
+      - name: Install gke-gcloud-auth-plugin
+        if: success()
+        run: |
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+          sudo apt-get update
+          sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
+      
+      # Build and push Docker image 
+      - name: Build Docker Image
+        if: success()
+        run: docker build -t gcr.io/${{ env.PROJECT_ID }}/chatbot-support-frontend:v1 .
+
+      - name: Push Docker Image to GCR
+        if: success()
+        run: docker push gcr.io/${{ env.PROJECT_ID }}/chatbot-support-frontend:v1
+
+      # Configure kubectl for GKE
+      - name: Configure kubectl
+        if: success()
+        run: |
+          gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} \
+            --region ${{ env.GKE_REGION }} --project ${{ env.PROJECT_ID }}
+            
+      # Deploy to GKE
+      - name: Apply Kubernetes Manifests
+        if: success()
+        run: kubectl apply -f k8s/deployment-staging.yml

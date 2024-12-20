@@ -85,4 +85,4 @@ jobs:
       # Deploy to GKE
       - name: Apply Kubernetes Manifests
         if: success()
-        run: kubectl apply -f k8s/deployment.yml
+        run: kubectl apply -f k8s/deployment-production.yml

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-support-frontend-deployment-staging
+  labels:
+    app: chatbot-support-frontend
+    env: staging
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: chatbot-support-frontend
+  template:
+    metadata:
+      labels:
+        app: chatbot-support-frontend
+    spec:
+      containers:
+      - image: 'gcr.io/ai-chatbot-support-444616/chatbot-support-frontend:v1'
+        imagePullPolicy: Always
+        name: chatbot-support-frontend
+        readinessProbe:
+          periodSeconds: 5
+          exec:
+            command:
+            - sh
+            - -c
+            - "mkdir -p /tmp && touch /tmp/healthy && cat /tmp/healthy"
+        ports:
+        - containerPort: 80

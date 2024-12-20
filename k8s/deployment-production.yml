@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chatbot-support-frontend-deployment
+  name: chatbot-support-frontend-deployment-production
   labels:
     app: chatbot-support-frontend
+    env: production
 spec:
   replicas: 2
   revisionHistoryLimit: 10
