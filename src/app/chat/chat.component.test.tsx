@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest'
 import { render, screen } from '@testing-library/react';
-import ChatComponent from './chatComponent';
+import ChatComponent from './chat.component';
 
 
 test('displays div for messages', () => {
