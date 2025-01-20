@@ -27,8 +27,6 @@ const LoginComponent = () => {
                 },
                 body: JSON.stringify(payload),
             });
-            console.log('POST request sent');
-            console.log(response);
 
             if(!response.ok) {
                 throw new Error('Failed to login'); // should be the error from the server
@@ -48,8 +46,9 @@ const LoginComponent = () => {
                     <h1>Login</h1>
                 </div>
                 <div className="form-field-container">
-                    <label className="form-field">Email</label>
-                    <input 
+                    <label htmlFor="email-field" className="form-field">Email</label>
+                    <input
+                        id='email-field' 
                         className="input"
                         type="text"
                         value={email}
@@ -57,8 +56,9 @@ const LoginComponent = () => {
                     />
                 </div>
                 <div className="form-field-container">    
-                    <label className="form-field">Password</label>
-                    <input 
+                    <label htmlFor="password-field" className="form-field">Password</label>
+                    <input
+                        id='password-field' 
                         className="input"
                         type="password"
                         value={password}
