@@ -14,7 +14,7 @@ const ChatComponent = () => {
   const [input, setInput] = useState<string>(''); // input is a string
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:3000'); // Backend WebSocket URL - and make this a env variable!
+    const socketInstance = io(`${process.env.NEXT_PUBLIC_BASE_URL}`); // Backend WebSocket URL - and make this a env variable!
     setSocket(socketInstance);
 
     socketInstance.on('message', (message: string) => { // Assuming message is a string

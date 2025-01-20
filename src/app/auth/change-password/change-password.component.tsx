@@ -12,21 +12,20 @@ const ChangePasswordComponent = () => {
 
     const handleSubmit = async (e: any) => {
         e?.preventDefault();
-        console.log('Submiting the form to the backend...');
-        // validate the form data
+    
         if (newPassword !== confirmPassword) {
             setError('New passwords do not match');
             return;
         }
-        // init the payload
+
         const payload = {
             originalPassword: oldPassword,
             newPassword,
             confirmPassword
         }
-        // send a post http request and capture the response header and body
+        
         try {
-            const response = await fetch('http://localhost:3000/auth/change-password', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/change-password`, {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
