@@ -1,75 +1,71 @@
-"use client"
-import { useState } from "react"
-import './login.component.css'
+"use client";
 import AuthUtils from "../utilities/utilities";
+import AuthFormComponent from "../common/auth.form-component";
+import { useState } from "react";
 
 const LoginComponent = () => {
-    const [email, setEmail] = useState('');   
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [values, setValues] = useState<Record<string, string>>({
+        email: "",
+        password: "",
+    });
+    const [error, setError] = useState<string>("");
+
+    const handleSubmit = async (values: Record<string, string>) => {
+        const { email, password } = values;
+        AuthUtils.validateEmail(email);
+
+        const payload = { email, password };
     
-    const handleSubmit = async (e: any) => {
-        e?.preventDefault();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
 
-
-        const payload = {
-            email: email,
-            password: password,
-        };
-        console.log(`Payload: ${JSON.stringify(payload)}`)
-
-        try {
-            AuthUtils.validateEmail(email);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if(!response.ok) {
-                throw new Error('Failed to login'); // should be the error from the server
-            }
-
-            alert('Should now be redirected to dashboard')
-        } catch(err: any) {
-            setError(err.message)       
+        if(!response.ok) {
+            const errMessage = await response.text();
+            console.log('setting the error now: ', errMessage);
+            setError(errMessage || 'Login attempt failed: invalid credentials');
+            return;
         }
+        
+        setError('');
         
     };
 
+    const handleChange = (name: string, value: string) => {
+        setValues((prevValues) => ({
+            ...prevValues,
+            [name]: value,
+        }));
+    };
+
+    const fields = [
+        {
+            name: 'email',
+            label: 'Email',
+            type: 'text',
+        },
+        {
+            name: 'password',
+            label: 'Password',
+            type: 'password',
+        },
+    ]
+
     return (
         <>
-            <form onSubmit={handleSubmit}>
-                <div className="title">
-                    <h1>Login</h1>
-                </div>
-                <div className="form-field-container">
-                    <label htmlFor="email-field" className="form-field">Email</label>
-                    <input
-                        id='email-field' 
-                        className="input"
-                        type="text"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div className="form-field-container">    
-                    <label htmlFor="password-field" className="form-field">Password</label>
-                    <input
-                        id='password-field' 
-                        className="input"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <div>    
-                    <button type="submit">Submit</button>
-                </div>
-            </form>
+            <AuthFormComponent
+                title={'Login'}
+                fields={fields}
+                values={values}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+                setError={setError}
+                error={error}
+            />
         </>
     );
 };
