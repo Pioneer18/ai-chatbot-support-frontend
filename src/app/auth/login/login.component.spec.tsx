@@ -62,10 +62,11 @@ describe('LoginComponent', () => {
     });
 
     test('displays error message if login fails', async () => {
-        mockFetch.mockResolvedValueOnce({
+        const mockResponse = {
             ok: false,
-            json: async () => ({}),
-        });
+            text: vi.fn().mockResolvedValue("Error: user not found"),
+        }
+        mockFetch.mockResolvedValueOnce(mockResponse);
 
         render(<LoginComponent />);
 
@@ -78,7 +79,7 @@ describe('LoginComponent', () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(screen.getByText(/Failed to login/i)).toBeDefined();
+            expect((screen.getByText(/Error: user not found/i))).toBeDefined();
         });
     });
 
