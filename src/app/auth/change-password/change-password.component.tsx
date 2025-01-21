@@ -10,7 +10,7 @@ const ChangePasswordComponent = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e?.preventDefault();
     
         if (newPassword !== confirmPassword) {
@@ -38,8 +38,12 @@ const ChangePasswordComponent = () => {
             }
 
             alert('Password changed succesfully')
-        } catch (error: any) {
-            setError(error.message)
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
         }
     };
 

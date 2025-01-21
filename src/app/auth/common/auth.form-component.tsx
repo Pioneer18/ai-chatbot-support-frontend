@@ -1,5 +1,5 @@
 "use client"
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import './auth.form-component.css';
 
 type FieldConfig = {
@@ -29,8 +29,12 @@ const AuthFormComponent = ({ title, fields, values, onChange, onSubmit, setError
         e.preventDefault();
         try {
             await onSubmit(values);
-        } catch(err: any) {
-            setError(err);
+        } catch(err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
         }
     }
 
